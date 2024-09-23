@@ -60,28 +60,28 @@ Sub Stock_Analysis()
         greatestDecrease = 0
         greatestVolume = 0
 
-        For k = 3 To ws.Cells(Rows.Count, "K").End(xlUp).Row
-            current_k = ws.Cells(k, 11).Value
-            volume = ws.Cells(k, 12).Value
+        For K = 3 To ws.Cells(Rows.Count, "K").End(xlUp).Row
+            current_k = ws.Cells(K, 11).Value
+            volume = ws.Cells(K, 12).Value
 
             ' Check for greatest increase
             If current_k > greatestIncrease Then
                 greatestIncrease = current_k
-                increaseName = ws.Cells(k, 9).Value
+                increaseName = ws.Cells(K, 9).Value
             End If
 
             ' Check for greatest decrease
             If current_k < greatestDecrease Then
                 greatestDecrease = current_k
-                decreaseName = ws.Cells(k, 9).Value
+                decreaseName = ws.Cells(K, 9).Value
             End If
 
             ' Check for greatest volume
             If volume > greatestVolume Then
                 greatestVolume = volume
-                greatestName = ws.Cells(k, 9).Value
+                greatestName = ws.Cells(K, 9).Value
             End If
-        Next k
+        Next K
 
         ' Output summary results
         ws.Range("N1").Value = "Column Name"
@@ -103,11 +103,24 @@ Sub Stock_Analysis()
         ' Color coding for quarterly changes
         For j = 2 To ws.Cells(Rows.Count, "J").End(xlUp).Row
             If ws.Cells(j, 10) > 0 Then
-                ws.Cells(j, 10).Interior.ColorIndex = 4  ' Green
+                ws.Cells(j, 10).Interior.ColorIndex = 4 ' Green
+                
             Else
                 ws.Cells(j, 10).Interior.ColorIndex = 3  ' Red
             End If
+               
         Next j
+        
+             For K = 2 To ws.Cells(Rows.Count, "K").End(xlUp).Row
+             
+            If ws.Cells(K, 11) > 0 Then
+                ws.Cells(K, 11).Interior.ColorIndex = 4 ' Green
+                
+            Else
+                ws.Cells(K, 11).Interior.ColorIndex = 3  ' Red
+            End If
+         
+        Next K
     Next ws
 End Sub
 
