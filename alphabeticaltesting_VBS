@@ -1,0 +1,113 @@
+Sub Stock_Analysis()
+    Dim ticker As String
+    Dim quarterlyOpen As Double
+    Dim quarterlyClose As Double
+    Dim quarterlyChange As Double
+    Dim totalStockVolume As Double
+    Dim percentChange As Double
+    Dim startRow As Long
+    Dim endRow As Long
+    Dim ws As Worksheet
+
+    For Each ws In Worksheets
+        ' Assign column headers
+        ws.Range("I1").Value = "Ticker"
+        ws.Range("J1").Value = "Quarterly Change"
+        ws.Range("K1").Value = "Percent Change"
+        ws.Range("L1").Value = "Total Stock Volume"
+
+        startRow = 2
+        totalStockVolume = 0
+        endRow = ws.Cells(Rows.Count, "A").End(xlUp).Row
+
+        ' Loop through each ticker
+        For i = 2 To endRow
+            If ws.Cells(i + 1, 1).Value <> ws.Cells(i, 1).Value Then
+                ticker = ws.Cells(i, 1).Value
+                quarterlyOpen = ws.Cells(startRow, 3).Value
+                quarterlyClose = ws.Cells(i, 6).Value
+
+                ' Calculate total stock volume
+                For j = startRow To i
+                    totalStockVolume = totalStockVolume + ws.Cells(j, 7).Value
+                Next j
+
+                ' Calculate changes
+                If quarterlyOpen = 0 Then
+                    percentChange = 0
+                Else
+                    quarterlyChange = quarterlyClose - quarterlyOpen
+                    percentChange = quarterlyChange / quarterlyOpen
+                End If
+
+                ' Output results
+                ws.Cells(startRow, 9).Value = ticker
+                ws.Cells(startRow, 10).Value = quarterlyChange
+                ws.Cells(startRow, 11).Value = percentChange
+                ws.Cells(startRow, 12).Value = totalStockVolume
+                ws.Cells(startRow, 11).NumberFormat = "0.00%"
+
+                startRow = startRow + 1
+                totalStockVolume = 0
+            End If
+        Next i
+
+        ' Calculate increases, decreases, and greatest volumes
+        Dim greatestIncrease As Double, greatestDecrease As Double, greatestVolume As Double
+        Dim increaseName As String, decreaseName As String, greatestName As String
+
+        greatestIncrease = 0
+        greatestDecrease = 0
+        greatestVolume = 0
+
+        For k = 3 To ws.Cells(Rows.Count, "K").End(xlUp).Row
+            current_k = ws.Cells(k, 11).Value
+            volume = ws.Cells(k, 12).Value
+
+            ' Check for greatest increase
+            If current_k > greatestIncrease Then
+                greatestIncrease = current_k
+                increaseName = ws.Cells(k, 9).Value
+            End If
+
+            ' Check for greatest decrease
+            If current_k < greatestDecrease Then
+                greatestDecrease = current_k
+                decreaseName = ws.Cells(k, 9).Value
+            End If
+
+            ' Check for greatest volume
+            If volume > greatestVolume Then
+                greatestVolume = volume
+                greatestName = ws.Cells(k, 9).Value
+            End If
+        Next k
+
+        ' Output summary results
+        ws.Range("N1").Value = "Column Name"
+        ws.Range("N2").Value = "Greatest % Increase"
+        ws.Range("N3").Value = "Greatest % Decrease"
+        ws.Range("N4").Value = "Greatest Total Volume"
+        ws.Range("O1").Value = "Ticker Name"
+        ws.Range("P1").Value = "Value"
+
+        ws.Range("O2").Value = increaseName
+        ws.Range("O3").Value = decreaseName
+        ws.Range("O4").Value = greatestName
+        ws.Range("P2").Value = greatestIncrease
+        ws.Range("P3").Value = greatestDecrease
+        ws.Range("P4").Value = greatestVolume
+
+        ws.Range("P2:P3").NumberFormat = "0.00%"
+
+        ' Color coding for quarterly changes
+        For j = 2 To ws.Cells(Rows.Count, "J").End(xlUp).Row
+            If ws.Cells(j, 10) > 0 Then
+                ws.Cells(j, 10).Interior.ColorIndex = 4  ' Green
+            Else
+                ws.Cells(j, 10).Interior.ColorIndex = 3  ' Red
+            End If
+        Next j
+    Next ws
+End Sub
+
